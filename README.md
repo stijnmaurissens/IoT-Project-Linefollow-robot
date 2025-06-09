@@ -1,73 +1,70 @@
-# IoT-Project-Linefollow-robot
-school opdracht: robot auto met lijnvolging en obstakel ontwijking 
-
-
  
 Inhoud
-1.	BESCHRIJVING VAN DE GEBRUIKTE HARDWARE.	
-2.	SCHEMA’S OF DIAGRAMMEN VAN DE HARDWARE-OPSTELLING EN BEKABELING.	
-3.	BESCHRIJVING VAN DE BASISFUNCTIONALITEIT.	
-3.1.	Lijnvolging	
-3.2. Obstakelontwijking	
-3.2.	Dual-Core Verwerking (ESP32)	
-4.	MQTT-INSTELLINGEN.	
-4.1.	Topics:	
-4.2.	Webdashboard:	
-5.	INSTALLATIE-INSTRUCTIES VOOR HET TESTEN VAN DE ROBOT EN MQTT-COMMUNICATIE.	
+1.	GITHUB LINK	3
+2.	BESCHRIJVING VAN DE GEBRUIKTE HARDWARE.	3
+3.	SCHEMA’S HARDWARE-OPSTELLING.	4
+4.	CODE OVERZICHT EN BELANGRIJKSTE FUNCTIES	5
+4.1.	Belangrijkste functies	5
+4.2.	Obstakelontwijking	5
+4.3.	Dual-Core Verwerking (ESP32)	5
+5.	MQTT-INSTELLINGEN.	6
+5.1.	esp32/status	6
+5.2.	esp32/distances_state	6
+5.3.	esp32/batterij	6
+5.4.	esp32/command	6
+6.	WEB DASHBOARD:	7
+7.	INSTALLATIE-INSTRUCTIES VOOR HET TESTEN VAN DE ROBOT EN MQTT-COMMUNICATIE.	8
+8.	NAMAAK INSTRUCTIES:	8
 
  
-1.	Beschrijving van de gebruikte hardware. 
+1.	GitHub link
+https://github.com/stijnmaurissens/IoT-Project-Linefollow-robot 
+
+2.	Beschrijving van de gebruikte hardware. 
 Een overzicht van de essentiële componenten.
 
 •	ESP32 Dev Board: Deze microcontroller bestuurt alle sensoren en actuatoren, verwerkt de logica voor lijnvolging en obstakelontwijking, en handelt de Wi-Fi-verbinding en MQTT-communicatie af. Het maakt gebruik van de dual-core.
 
-•	Raspberry Pi 5: hier staat de volgende software op : MQTT,InfluxDB database en Grafana (voor het visualiseren van de data in dashboards).
+•	Raspberry Pi 5: hier staat de volgende software op : MQTT,InfluxDB database en Node Red (voor het visualiseren van de data in dashboards).
 
 •	3x Infrarood (IR) Sensoren: Gebruikt voor lijnvolging.
 
-•	1x Ultrasone Sensor (HC-SR04): Gebruikt voor het detecteren van obstakels.
+•	3x Ultrasone Sensor (HC-SR04): Gebruikt voor het detecteren van obstakels.
 
-•	L298N Motor Driver Module: Stuurt de twee DC-motoren aan
-
-•	2x DC Motoren.
+•	2x DC Motoren: voor de robot vooruit te laten gaan
 
 •	1x Drukknop (Button): hiermee kan de robot gepauzeerd of worden hervat.
 
 •	9V Batterij: Levert stroom aan de ESP32 en de motoren.
 
-•	•  Spanningsdeler :voor Batterijmonitorin. 
+•	Onze zelf ontworpen PCB
 
-2.	Schema’s of diagrammen van de hardware-opstelling en bekabeling.
+3.	Schema’s hardware-opstelling.
+
  
+4.	Code overzicht en belangrijkste functies 
+4.1.	Belangrijkste functies
+Het lijnvolging systeem.
+Als naar de lijn kijken en enkel de midelste sensor ziet de lijn dan rijd de robot vooruit. De lijn detecteren doet hij met de volgende code:
 
- 
-3.	Beschrijving van de basisfunctionaliteit.
-3.1.	Lijnvolging
-De robot  volgt een zwarte lijn op een “witte” ondergrond te volgen. Dit wordt gedaan door drie naar beneden gerichte infraroodsensoren.
-•	Sensoruitlezing: De statussen van de drie IR-sensoren (sensorValues[0], sensorValues[1], sensorValues[2]) worden continu gelezen. Een LOW waarde betekent dat wit wordt gedetecteerd, en HIGH dat zwart wordt gedetecteerd
+if (irSensorWaarden[0] == LOW && irSensorWaarden[1] == HIGH && irSensorWaarden[2] == LOW) {
+            rijVooruit(110);
+            Serial.println("vooruit");
 
-•	Basislogica
-1.	Rechtdoor: Als de middelste sensor de lijn ziet (HIGH) en de buitenste sensoren niet (LOW):
-	sensorValues[0] == LOW && sensorValues[1] == HIGH && sensorValues[2] == LOW
-	Actie: forward(100); (rijdt vooruit met snelheid 100).
-2.	Correctie naar Links: Als de linkersensor de lijn ziet (HIGH) en de rechtersensor niet (LOW):
-	sensorValues[0] == HIGH && sensorValues[2] == LOW
-	Actie: turn_left();
-3.	Correctie naar Rechts: Als de rechtersensor de lijn ziet (HIGH) en de linkersensor niet (LOW):
-	sensorValues[0] == LOW && sensorValues[2] == HIGH
-	Actie: turn_right();
-4.	Alle Sensoren Zien Lijn: Als alle drie de sensoren de lijn detecteren (HIGH):
-	sensorValues[0] == HIGH && sensorValues[1] == HIGH && sensorValues[2] == HIGH
-	Actie: stop(); delay(3000); forward(100); delay(300); (stopt 3 seconden, rijdt dan kort vooruit).
-5.	Geen Lijn Gedetecteerd / Andere Scenario's:
-	Actie: stop();
-•	Snelheidscompensatie: De functie compenseerSnelheid(int basisSnelheid) past de PWM-waarde voor de motoren aan op basis van de actuele batterijspanning (g_huidigeSpanning). Dit helpt om een meer consistente rijsnelheid te behouden naarmate de batterij leegloopt.
+Waarbij onze functie rijVooruit gebruikt word met de parameter van 110. Deze parameter word gebruikt in de volgende code om de snelheid te bepalen. Waarbij beide motoren vooruit rijden.
 
+void rijVooruit(int snelheid) {
+    digitalWrite(motorRechts_pin1, LOW); digitalWrite(motorRechts_pin2, HIGH); analogWrite(motorRechts_enable, snelheid);
+    digitalWrite(motorLinks_pin1, HIGH); digitalWrite(motorLinks_pin2, LOW); analogWrite(motorLinks_enable, snelheid);
 
-3.2. Obstakelontwijking
-De robot kan obstakels detecteren en een manoeuvre uitvoeren om deze proberen te ontwijken.
+Om de robot te laten draaien, passen we dezelfde logica toe als voor het vooruit rijden, maar keren we de draairichting van één van de wielen om.
 
-3.2.	Dual-Core Verwerking (ESP32)
+ 
+4.2.	Obstakelontwijking
+De robot kan obstakels detecteren en een poging manoeuvre uitvoeren om deze proberen te ontwijken.
+Maar deze werkt helaas nog niet zoals gewenst
+
+4.3.	Dual-Core Verwerking (ESP32)
 De ESP32 heeft een dual-core processor, wat parallelle taakuitvoering mogelijk .
 Core 0 (Core0Task):
 o	Deze core in een oneindige lus, toegewezen met xTaskCreatePinnedToCore(..., 0).
@@ -82,30 +79,33 @@ o	Voert de loop() functie continu uit.
 o	Verantwoordelijkheden:
 	Hoofdlogica Robot: Lijnvolging en aanroepen van ontwijkObstakel() wanneer nodig.
 	Reageert op de isPaused door te stoppen.
+5.	MQTT-instellingen.
+5.1.	esp32/status
+Richting: Robot → Dashboard
+Doel: Dit topic wordt gebruikt voor algemene, menselijk leesbare statusupdates. Denk aan berichten zoals "Hervat", "Gepauzeerd (Knop)", of de aftelberichten zoals "Pauze. Hervat over 15 seconden...". Het is bedoeld om direct op het dashboard te tonen wat de robot aan het doen is.
 
+5.2.	esp32/distances_state
+Richting: Robot → Dashboard
+Doel: Dit is het belangrijkste datakanaal. De robot stuurt hierover een compleet JSON-object met alle relevante sensordata en de huidige status. Het dashboard gebruikt deze gestructureerde data om de visuele elementen, zoals de afstandsmeters en statusiconen, bij te werken.
+Voorbeeldbericht: {"front":15, "left":30, "right":32, "voltage":7.8, "paused":false}
 
-4.	MQTT-instellingen.
-4.1.	Topics:
+5.3.	esp32/batterij
+Richting: Robot → Dashboard
+Doel: Hoewel de batterijstatus ook in het distances_state topic zit, wordt op dit aparte topic enkel het batterijpercentage (als een getal) verstuurd. Dit maakt het voor andere systemen of simpele monitoring-scripts makkelijker om enkel de batterijstatus te volgen, zonder een heel JSON-object te moeten parsen.
 
-De ESP32 publiceert data naar de volgende MQTT-topics
-•	esp32/batterij
-o	Beschrijving: Publiceert het batterijpercentage.
-o	code: dtostrf(batterij, 4, 1, batStr); client.publish("esp32/batterij", batStr);
-o	Dashboard: deze word als een guage gevisualiseerd op grafana
-•	esp32/ultrasonep
-o	Beschrijving: Publiceert de gemeten afstand door de ultrasone sensor.
-o	Voorbeeld uit code: dtostrf(distance1, 4, 1, ultStr); client.publish("esp32/ultrasone", ultStr);
-o	Dashboard: word als een lijn weergeven (hoe dichter bij een object hoe kleiner en roder de lijn word)
-•	esp32/status
-o	Beschrijving: Publiceert statusberichten over de werking van de robot.
-o	Mogelijke berichten:
-	"Gepauzeerd"
-	"Robot hervat"
-	"Auto-hervat na 30s"
-	"Start ontwijking"
-	"Ontwijking voltooid"
-4.2.	Webdashboard:
-Grafana krijgt de sensor data binnen via de Raspberry pi en influxdb. Grafana ververst automatisch elke 5seconden, maar indien er nog accuratere data gewenst word kan dit ook handmatig ververst worden. 
-5.	Installatie-instructies voor het testen van de robot en MQTT-communicatie.
-Zet de robot aan met de juiste gegevens van de MQTT-broker (internet naam en wachtwoord, de server IP, de MQTT username en wachtwoord). Activeer met de zelfde gegevens MQTT op de Raspberry pi en de data zou moeten binnen komen. Men kan de data dubbel checken door een ssh connectie te maken met de PI en naar de Serial monitor te kijken. 
+5.4.	esp32/command
+Richting: Dashboard → Robot
+Doel: Dit is het commandokanaal om de robot aan te sturen. Wanneer een gebruiker op de pauzeknop in de app of het dashboard klikt, wordt het bericht "toggle_pause" naar dit topic gestuurd. De robot luistert continu naar dit topic en zal zijn pauzestatus omschakelen zodra hij dit bericht ontvangt.
+ 
+6.	Web dashboard:
+Node Red krijgt de sensor data binnen via de MQTT. 
+  
+7.	Installatie-instructies voor het testen van de robot en MQTT-communicatie.
+Zet de robot aan (door de batterij aan te sluiten) met de juiste gegevens van de MQTT-broker (internet naam en wachtwoord, de server IP, de MQTT username en wachtwoord). Activeer met de zelfde gegevens MQTT op de Raspberry pi en de data zou moeten binnen komen. Men kan de data dubbel checken door een ssh connectie te maken met de PI en naar de Serial monitor te kijken.
+Voor onderhoud kan u de batterij gewoon uit trekken en vervangen met een nieuwe.
+
+8.	Namaak instructies:
+Indien u deze robot wilt namaken kan u de Gerber files vinden op onze GitHub (zie document maarten_stijn.zip)
+Eens u de print heeft kan u de deze vullen en verbinden zoals op het schema staat (zie immage.png)
+De code dat wij gebruiken is ook te vinden op onze GitHub pagina. 
 
