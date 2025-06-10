@@ -1,7 +1,6 @@
 // ===================================================================================
 //
-//   FINALE CODE - V3.3
-//   Project: Autonome Lijnvolgende Robot met Obstakeldetectie
+//   Lijnvolgende Robot met Obstakeldetectie
 //
 //   BESCHRIJVING:
 //   Deze code is voor een ESP32-robot die een zwarte lijn volgt en obstakels ontwijkt.
