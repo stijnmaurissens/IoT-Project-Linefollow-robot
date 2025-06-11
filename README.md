@@ -1,7 +1,3 @@
-Oké, ik begrijp de feedback. De `cpp` codeblokken zijn het probleem.
-
-Hier is de versie met de volledige GitHub-opmaak (koppen, lijsten, etc.), maar waarbij de programmeercode zelf als gewone tekst is opgenomen, zonder de speciale codeblokken. Dit alles in één compleet, kopieerbaar blok.
-
 ```markdown
 # IoT Project: Lijnvolgende Robot met Obstakelontwijking 🤖
 
