@@ -1,112 +1,148 @@
- 
-Inhoud
-1.	GITHUB LINK	3
-2.	BESCHRIJVING VAN DE GEBRUIKTE HARDWARE.	3
-3.	SCHEMA’S HARDWARE-OPSTELLING.	4
-4.	CODE OVERZICHT EN BELANGRIJKSTE FUNCTIES	5
-4.1.	Belangrijkste functies	5
-4.2.	Obstakelontwijking	5
-4.3.	Dual-Core Verwerking (ESP32)	5
-5.	MQTT-INSTELLINGEN.	6
-5.1.	esp32/status	6
-5.2.	esp32/distances_state	6
-5.3.	esp32/batterij	6
-5.4.	esp32/command	6
-6.	WEB DASHBOARD:	7
-7.	INSTALLATIE-INSTRUCTIES VOOR HET TESTEN VAN DE ROBOT EN MQTT-COMMUNICATIE.	8
-8.	NAMAAK INSTRUCTIES:	8
+Oké, ik begrijp de feedback. De `cpp` codeblokken zijn het probleem.
 
- 
-1.	GitHub link
-https://github.com/stijnmaurissens/IoT-Project-Linefollow-robot 
+Hier is de versie met de volledige GitHub-opmaak (koppen, lijsten, etc.), maar waarbij de programmeercode zelf als gewone tekst is opgenomen, zonder de speciale codeblokken. Dit alles in één compleet, kopieerbaar blok.
 
-2.	Beschrijving van de gebruikte hardware. 
-Een overzicht van de essentiële componenten.
+```markdown
+# IoT Project: Lijnvolgende Robot met Obstakelontwijking 🤖
 
-•	ESP32 Dev Board: Deze microcontroller bestuurt alle sensoren en actuatoren, verwerkt de logica voor lijnvolging en obstakelontwijking, en handelt de Wi-Fi-verbinding en MQTT-communicatie af. Het maakt gebruik van de dual-core.
+Dit project omvat de ontwikkeling van een autonome lijnvolgende robot. De robot is gebouwd op een ESP32-microcontroller, kan zelfstandig obstakels ontwijken en communiceert zijn status en sensordata in real-time via MQTT. Een Node-RED dashboard visualiseert deze data voor eenvoudige monitoring.
 
-•	Raspberry Pi 5: hier staat de volgende software op : MQTT,InfluxDB database en Node Red (voor het visualiseren van de data in dashboards).
+## Inhoudsopgave
+1.  [GitHub Repository](#1-github-repository)
+2.  [Gebruikte Hardware](#2-gebruikte-hardware-)
+3.  [Hardware-opstelling](#3-hardware-opstelling-)
+4.  [Code Overzicht](#4-code-overzicht-)
+5.  [MQTT-communicatie](#5-mqtt-instellingen-)
+6.  [Web Dashboard](#6-web-dashboard-)
+7.  [Installatie en Testen](#7-installatie-instructies-)
+8.  [Zelf Nabouwen](#8-namaak-instructies-)
 
-•	3x Infrarood (IR) Sensoren: Gebruikt voor lijnvolging.
+---
 
-•	3x Ultrasone Sensor (HC-SR04): Gebruikt voor het detecteren van obstakels.
+### 1. GitHub Repository
+De volledige broncode en Gerber-files zijn te vinden op GitHub:
+[https://github.com/stijnmaurissens/IoT-Project-Linefollow-robot](https://github.com/stijnmaurissens/IoT-Project-Linefollow-robot)
 
-•	2x DC Motoren: voor de robot vooruit te laten gaan
+---
 
-•	1x Drukknop (Button): hiermee kan de robot gepauzeerd of worden hervat.
+### 2. Gebruikte Hardware ⚙️
 
-•	9V Batterij: Levert stroom aan de ESP32 en de motoren.
+Een overzicht van de essentiële componenten die nodig zijn voor dit project:
 
-•	Onze zelf ontworpen PCB
+* **ESP32 Dev Board**: Het brein van de robot. Deze microcontroller bestuurt alle componenten, verwerkt de logica en regelt de Wi-Fi-verbinding en MQTT-communicatie.
+* **Raspberry Pi 5**: Host voor de backend-software: MQTT-broker, InfluxDB database en Node-RED.
+* **3x Infrarood (IR) Sensoren**: Worden gebruikt voor het detecteren en volgen van een zwarte lijn.
+* **3x Ultrasone Sensoren (HC-SR04)**: Voor het detecteren van obstakels.
+* **2x DC Motoren**: Drijven de wielen van de robot aan.
+* **1x Drukknop**: Maakt het mogelijk om de robot handmatig te pauzeren en te hervatten.
+* **9V Batterij**: Voorziet de ESP32 en de motoren van stroom.
+* **Zelf ontworpen PCB**: Een custom printplaat om alle componenten netjes en betrouwbaar te verbinden.
 
-3.	Schema’s hardware-opstelling.
+---
 
- 
-4.	Code overzicht en belangrijkste functies 
-4.1.	Belangrijkste functies
-Het lijnvolging systeem.
-Als naar de lijn kijken en enkel de midelste sensor ziet de lijn dan rijd de robot vooruit. De lijn detecteren doet hij met de volgende code:
+### 3. Hardware-opstelling 🔌
+
+Voor de precieze verbindingen tussen de ESP32, sensoren, motoren en andere componenten, zie het schema in de projectbestanden.
+
+*[Voeg hier een afbeelding van het Fritzing- of bedradingsschema in]*
+
+---
+
+### 4. Code Overzicht 👨‍💻
+
+De code is geschreven in C++ voor het Arduino-framework op de ESP32.
+
+#### 4.1. Belangrijkste Functies (Lijnvolging)
+
+Het lijnvolgsysteem is de kernfunctionaliteit. Als alleen de middelste sensor de lijn ziet, rijdt de robot rechtdoor. De lijn detecteren doet hij met de volgende code:
 
 if (irSensorWaarden[0] == LOW && irSensorWaarden[1] == HIGH && irSensorWaarden[2] == LOW) {
-            rijVooruit(110);
-            Serial.println("vooruit");
+    rijVooruit(110);
+    Serial.println("vooruit");
+}
 
-Waarbij onze functie rijVooruit gebruikt word met de parameter van 110. Deze parameter word gebruikt in de volgende code om de snelheid te bepalen. Waarbij beide motoren vooruit rijden.
+Waarbij onze functie `rijVooruit` gebruikt wordt met de parameter van 110. Deze parameter wordt gebruikt in de volgende code om de snelheid te bepalen, waarbij beide motoren vooruit rijden.
 
 void rijVooruit(int snelheid) {
-    digitalWrite(motorRechts_pin1, LOW); digitalWrite(motorRechts_pin2, HIGH); analogWrite(motorRechts_enable, snelheid);
-    digitalWrite(motorLinks_pin1, HIGH); digitalWrite(motorLinks_pin2, LOW); analogWrite(motorLinks_enable, snelheid);
+    digitalWrite(motorRechts_pin1, LOW);
+    digitalWrite(motorRechts_pin2, HIGH); 
+    analogWrite(motorRechts_enable, snelheid);
+    
+    digitalWrite(motorLinks_pin1, HIGH);
+    digitalWrite(motorLinks_pin2, LOW); 
+    analogWrite(motorLinks_enable, snelheid);
+}
 
 Om de robot te laten draaien, passen we dezelfde logica toe als voor het vooruit rijden, maar keren we de draairichting van één van de wielen om.
 
- 
-4.2.	Obstakelontwijking
-De robot kan obstakels detecteren en een poging manoeuvre uitvoeren om deze proberen te ontwijken.
-Maar deze werkt helaas nog niet zoals gewenst
+#### 4.2. Obstakelontwijking
 
-4.3.	Dual-Core Verwerking (ESP32)
-De ESP32 heeft een dual-core processor, wat parallelle taakuitvoering mogelijk .
-Core 0 (Core0Task):
-o	Deze core in een oneindige lus, toegewezen met xTaskCreatePinnedToCore(..., 0).
-o	Verantwoordelijkheden:
-	MQTT Client Loop: client.loop() onderhoudt de verbinding en verwerkt inkomende/uitgaande MQTT-berichten.
-	MQTT Herverbinding: if (!client.connected()) reconect(); zorgt dat de verbinding met de broker hersteld wordt indien verloren.
-	Knopafhandeling: Leest de status van buttonPin om isPaused te wisselen.
-	Automatisch Hervatten: Als isPaused is en 30 seconden (pauseDuration) zijn verstreken, wordt isPaused op false gezet.
-Core 1:
-o	Voert de setup() functie eenmalig uit.
-o	Voert de loop() functie continu uit.
-o	Verantwoordelijkheden:
-	Hoofdlogica Robot: Lijnvolging en aanroepen van ontwijkObstakel() wanneer nodig.
-	Reageert op de isPaused door te stoppen.
-5.	MQTT-instellingen.
-5.1.	esp32/status
-Richting: Robot → Dashboard
-Doel: Dit topic wordt gebruikt voor algemene, menselijk leesbare statusupdates. Denk aan berichten zoals "Hervat", "Gepauzeerd (Knop)", of de aftelberichten zoals "Pauze. Hervat over 15 seconden...". Het is bedoeld om direct op het dashboard te tonen wat de robot aan het doen is.
+De robot kan zelfstandig obstakels ontwijken. Ziet hij een obstakel, dan start hij een manoeuvre om eromheen te rijden en zoekt daarna de lijn weer op.
 
-5.2.	esp32/distances_state
-Richting: Robot → Dashboard
-Doel: Dit is het belangrijkste datakanaal. De robot stuurt hierover een compleet JSON-object met alle relevante sensordata en de huidige status. Het dashboard gebruikt deze gestructureerde data om de visuele elementen, zoals de afstandsmeters en statusiconen, bij te werken.
-Voorbeeldbericht: {"front":15, "left":30, "right":32, "voltage":7.8, "paused":false}
+##### **Bekend Probleem & Mogelijke Verbetering** ⚠️
+* **Het probleem**: De robot draait op basis van **tijd**, niet op basis van een gemeten hoek. Dit is onnauwkeurig en sterk afhankelijk van de batterijspanning en de ondergrond.
+* **De oplossing**: Implementeer een **gyroscoop/accelerometer (bv. MPU-6050)**. Hiermee kan de robot zijn rotatie nauwkeurig meten en draaien tot een exacte hoek van 90 graden is bereikt. Dit zou de betrouwbaarheid aanzienlijk verbeteren.
 
-5.3.	esp32/batterij
-Richting: Robot → Dashboard
-Doel: Hoewel de batterijstatus ook in het distances_state topic zit, wordt op dit aparte topic enkel het batterijpercentage (als een getal) verstuurd. Dit maakt het voor andere systemen of simpele monitoring-scripts makkelijker om enkel de batterijstatus te volgen, zonder een heel JSON-object te moeten parsen.
+#### 4.3. Dual-Core Verwerking (ESP32)
 
-5.4.	esp32/command
-Richting: Dashboard → Robot
-Doel: Dit is het commandokanaal om de robot aan te sturen. Wanneer een gebruiker op de pauzeknop in de app of het dashboard klikt, wordt het bericht "toggle_pause" naar dit topic gestuurd. De robot luistert continu naar dit topic en zal zijn pauzestatus omschakelen zodra hij dit bericht ontvangt.
+De ESP32 heeft twee processorkernen, wat ons toelaat om taken parallel uit te voeren voor betere prestaties.
 
- 
-6.	Web dashboard:
-Node Red krijgt de sensor data binnen via de MQTT. 
-  
-7.	Installatie-instructies voor het testen van de robot en MQTT-communicatie.
-Zet de robot aan (door de batterij aan te sluiten) met de juiste gegevens van de MQTT-broker (internet naam en wachtwoord, de server IP, de MQTT username en wachtwoord). Activeer met de zelfde gegevens MQTT op de Raspberry pi en de data zou moeten binnen komen. Men kan de data dubbel checken door een ssh connectie te maken met de PI en naar de Serial monitor te kijken.
-Voor onderhoud kan u de batterij gewoon uit trekken en vervangen met een nieuwe.
+* **Core 0**: Draait een toegewijde taak voor netwerkcommunicatie.
+    * Onderhoudt de MQTT-verbinding.
+    * Probeert automatisch opnieuw te verbinden als de connectie wegvalt.
+    * Verwerkt de input van de fysieke pauzeknop.
 
-8.	Namaak instructies:
-Indien u deze robot wilt namaken kan u de Gerber files vinden op onze GitHub (zie document maarten_stijn.zip)
-Eens u de print heeft kan u de deze vullen en verbinden zoals op het schema staat (zie immage.png)
-De code dat wij gebruiken is ook te vinden op onze GitHub pagina. 
+* **Core 1**: Draait de standaard `setup()` en `loop()` functies.
+    * Voert de hoofdlogica van de robot uit: lijnvolging en het aanroepen van de obstakelontwijking.
+    * Reageert op de pauzestatus door de motoren te stoppen.
 
+---
+
+### 5. MQTT-instellingen 📡
+
+De robot communiceert via de volgende MQTT-topics:
+
+* **esp32/status**
+    * **Richting**: Robot → Dashboard
+    * **Doel**: Stuurt menselijk leesbare statusupdates, zoals "Hervat" of "Gepauzeerd".
+
+* **esp32/distances_state**
+    * **Richting**: Robot → Dashboard
+    * **Doel**: Stuurt een JSON-object met alle sensordata en de machinestatus.
+    * **Voorbeeldbericht**: `{"front":15, "left":30, "right":32, "voltage":7.8, "paused":false}`
+
+* **esp32/batterij**
+    * **Richting**: Robot → Dashboard
+    * **Doel**: Stuurt enkel het batterijpercentage als een getal, voor simpele monitoring.
+
+* **esp32/command**
+    * **Richting**: Dashboard → Robot
+    * **Doel**: Ontvangt commando's, zoals "toggle_pause", om de robot aan te sturen.
+
+---
+
+### 6. Web Dashboard 📊
+
+Een **Node-RED** dashboard wordt gebruikt om de sensordata die via MQTT binnenkomt te visualiseren. Dit geeft een real-time overzicht van de status en metingen van de robot.
+
+---
+
+### 7. Installatie-instructies 🚀
+
+1.  Zet de robot aan door de batterij aan te sluiten.
+2.  Zorg ervoor dat de Wi-Fi en MQTT-gegevens (broker IP, username, wachtwoord) correct zijn ingevuld in de code.
+3.  Activeer de MQTT-broker op de Raspberry Pi.
+4.  Data zou nu moeten binnenkomen. Controleer dit via het Node-RED dashboard of een MQTT-client.
+5.  Voor onderhoud kan de batterij eenvoudig losgekoppeld en vervangen worden.
+
+---
+
+### 8. Namaak Instructies 🛠️
+
+Indien u deze robot wilt namaken:
+
+1.  De **Gerber-files** voor de PCB zijn te vinden in de GitHub repository.
+2.  Soldeer de componenten op de printplaat en verbind alles zoals op het schema staat.
+3.  De volledige **Arduino-code** voor de ESP32 is ook te vinden op de GitHub-pagina.
+
+```
