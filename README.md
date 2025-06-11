@@ -1,4 +1,3 @@
-```markdown
 # IoT Project: Lijnvolgende Robot met Obstakelontwijking 🤖
 
 Dit project omvat de ontwikkeling van een autonome lijnvolgende robot. De robot is gebouwd op een ESP32-microcontroller, kan zelfstandig obstakels ontwijken en communiceert zijn status en sensordata in real-time via MQTT. Een Node-RED dashboard visualiseert deze data voor eenvoudige monitoring.
@@ -141,4 +140,3 @@ Indien u deze robot wilt namaken:
 2.  Soldeer de componenten op de printplaat en verbind alles zoals op het schema staat.
 3.  De volledige **Arduino-code** voor de ESP32 is ook te vinden op de GitHub-pagina.
 
-```
