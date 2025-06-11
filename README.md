@@ -1,4 +1,4 @@
-# IoT Project: Lijnvolgende Robot met Obstakelontwijking 🤖
+# IoT Project: Lijnvolgende Robot met Obstakelontwijking
 
 Dit project omvat de ontwikkeling van een autonome lijnvolgende robot. De robot is gebouwd op een ESP32-microcontroller, kan zelfstandig obstakels ontwijken en communiceert zijn status en sensordata in real-time via MQTT. Een Node-RED dashboard visualiseert deze data voor eenvoudige monitoring.
 
@@ -20,7 +20,7 @@ De volledige broncode en Gerber-files zijn te vinden op GitHub:
 
 ---
 
-### 2. Gebruikte Hardware ⚙️
+### 2. Gebruikte Hardware
 
 Een overzicht van de essentiële componenten die nodig zijn voor dit project:
 
@@ -35,7 +35,7 @@ Een overzicht van de essentiële componenten die nodig zijn voor dit project:
 
 ---
 
-### 3. Hardware-opstelling 🔌
+### 3. Hardware-opstelling
 
 Voor de precieze verbindingen tussen de ESP32, sensoren, motoren en andere componenten, zie het schema in de projectbestanden.
 
@@ -45,7 +45,7 @@ Voor de precieze verbindingen tussen de ESP32, sensoren, motoren en andere compo
 
 ---
 
-### 4. Code Overzicht 👨‍💻
+### 4. Code Overzicht
 
 De code is geschreven in C++ voor het Arduino-framework op de ESP32.
 
@@ -76,7 +76,7 @@ Om de robot te laten draaien, passen we dezelfde logica toe als voor het vooruit
 
 De robot kan zelfstandig obstakels ontwijken. Ziet hij een obstakel, dan start hij een manoeuvre om eromheen te rijden en zoekt daarna de lijn weer op.
 
-##### **Bekend Probleem & Mogelijke Verbetering** ⚠️
+##### **Bekend Probleem & Mogelijke Verbetering** 
 * **Het probleem**: De robot draait op basis van **tijd**, niet op basis van een gemeten hoek. Dit is onnauwkeurig en sterk afhankelijk van de batterijspanning en de ondergrond.
 * **De oplossing**: Implementeer een **gyroscoop/accelerometer (bv. MPU-6050)**. Hiermee kan de robot zijn rotatie nauwkeurig meten en draaien tot een exacte hoek van 90 graden is bereikt. Dit zou de betrouwbaarheid aanzienlijk verbeteren.
 
@@ -118,13 +118,13 @@ De robot communiceert via de volgende MQTT-topics:
 
 ---
 
-### 6. Web Dashboard 📊
+### 6. Web Dashboard 
 
 Een **Node-RED** dashboard wordt gebruikt om de sensordata die via MQTT binnenkomt te visualiseren. Dit geeft een real-time overzicht van de status en metingen van de robot.
 
 ---
 
-### 7. Installatie-instructies 🚀
+### 7. Installatie-instructies 
 
 1.  Zet de robot aan door de batterij aan te sluiten.
 2.  Zorg ervoor dat de Wi-Fi en MQTT-gegevens (broker IP, username, wachtwoord) correct zijn ingevuld in de code.
@@ -134,7 +134,7 @@ Een **Node-RED** dashboard wordt gebruikt om de sensordata die via MQTT binnenko
 
 ---
 
-### 8. Namaak Instructies 🛠️
+### 8. Namaak Instructies 
 
 Indien u deze robot wilt namaken:
 
