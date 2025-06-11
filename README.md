@@ -96,7 +96,8 @@ Doel: Hoewel de batterijstatus ook in het distances_state topic zit, wordt op di
 5.4.	esp32/command
 Richting: Dashboard → Robot
 Doel: Dit is het commandokanaal om de robot aan te sturen. Wanneer een gebruiker op de pauzeknop in de app of het dashboard klikt, wordt het bericht "toggle_pause" naar dit topic gestuurd. De robot luistert continu naar dit topic en zal zijn pauzestatus omschakelen zodra hij dit bericht ontvangt.
- 
+
+ 
 6.	Web dashboard:
 Node Red krijgt de sensor data binnen via de MQTT. 
   
