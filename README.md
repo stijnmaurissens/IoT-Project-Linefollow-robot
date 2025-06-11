@@ -39,7 +39,9 @@ Een overzicht van de essentiële componenten die nodig zijn voor dit project:
 
 Voor de precieze verbindingen tussen de ESP32, sensoren, motoren en andere componenten, zie het schema in de projectbestanden.
 
-*[Voeg hier een afbeelding van het Fritzing- of bedradingsschema in]*
+![Afbeelding1](https://github.com/user-attachments/assets/4a5ead37-a776-44eb-9caa-6d0733d1292b)
+![Afbeelding2](https://github.com/user-attachments/assets/a2e491b7-f82c-4964-918c-046b83fa8477)
+
 
 ---
 
